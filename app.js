@@ -4,6 +4,7 @@ const session = require("express-session");
 const bodyParser = require("body-parser");
 
 const User = require("./models/User");
+const Article = require("./models/Article");
 
 const app = express();
 const PORT = 3000;
@@ -22,7 +23,7 @@ app.set("view engine", "pug");
 app.set("views", "./views");
 
 app.get("/", (req, res) => {
-  res.render("welcome");
+  res.render("welcome", { username: req.session.user.username });
 });
 
 app.get("/login", (req, res) => {
@@ -31,6 +32,10 @@ app.get("/login", (req, res) => {
 
 app.get("/register", (req, res) => {
   res.render("register");
+});
+
+app.get("/addArticle", (req, res) => {
+  res.render("addArticle", { username: req.session.user.username });
 });
 
 app.post("/login", async (req, res) => {
@@ -71,6 +76,19 @@ app.post("/register", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.render("register", { error: "An error occurred. Please try again." });
+  }
+});
+
+app.post("/addArticle", async (req, res) => {
+  const { title, body } = req.body;
+  const username = req.session.user.username;
+  try {
+    const newArticle = new Article({ title, body, username });
+    await newArticle.save();
+    res.redirect("/welcome");
+  } catch (err) {
+    console.error(err);
+    res.render("addArticle", { error: "Error creating article" });
   }
 });
 

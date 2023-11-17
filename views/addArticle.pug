@@ -1,0 +1,16 @@
+html
+   head
+      title New article
+   body
+      h1 Article
+      form(action="/addArticle", method="post")
+         label(for="title") title:
+         input(type="text", name="title", required)
+         br
+         label(for="body") body:
+         input(type="text", name="body", required)
+         br
+         input(type="submit", value="add")
+      if error
+         p.error= error
+      a(href="/") Cancel
