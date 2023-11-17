@@ -1,0 +1,17 @@
+html
+   head
+      title Login
+   body
+      h1 Login
+      form(action="/login", method="post")
+         label(for="username") Username:
+         input(type="text", name="username", required)
+         br
+         label(for="password") Password:
+         input(type="password", name="password", required)
+         br
+         input(type="submit", value="Login")
+      if error
+         p.error= error
+      p Don't have an account? 
+         a(href="/register") Register here
