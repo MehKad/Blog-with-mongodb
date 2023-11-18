@@ -22,8 +22,20 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "pug");
 app.set("views", "./views");
 
-app.get("/", (req, res) => {
-  res.render("welcome", { username: req.session.user.username });
+app.get("/", async (req, res) => {
+  try {
+    const articles = await Article.find();
+    if (req.session.user) {
+      res.render("welcome", { username: req.session.user.username, articles });
+    } else {
+      res.render("welcome", { articles });
+    }
+  } catch (err) {
+    console.error(err);
+    res.render("welcome", {
+      error: "An error occurred while fetching articles",
+    });
+  }
 });
 
 app.get("/login", (req, res) => {
@@ -46,7 +58,7 @@ app.post("/login", async (req, res) => {
 
     if (user) {
       req.session.user = user;
-      res.redirect("/welcome");
+      res.redirect("/");
     } else {
       res.render("login", { error: "Invalid username or password" });
     }
@@ -85,7 +97,7 @@ app.post("/addArticle", async (req, res) => {
   try {
     const newArticle = new Article({ title, body, username });
     await newArticle.save();
-    res.redirect("/welcome");
+    res.redirect("/");
   } catch (err) {
     console.error(err);
     res.render("addArticle", { error: "Error creating article" });
@@ -95,18 +107,10 @@ app.post("/addArticle", async (req, res) => {
 app.get("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) {
-      console.error(err);
+      console.error("Error destroying session:", err);
     }
-    res.redirect("/login");
+    res.redirect("/");
   });
-});
-
-app.get("/welcome", (req, res) => {
-  if (req.session.user) {
-    res.render("welcome", { username: req.session.user.username });
-  } else {
-    res.redirect("/login");
-  }
 });
 
 mongoose
@@ -114,10 +118,10 @@ mongoose
     "mongodb+srv://mehkadiri:mehkadiri@test.havg0ya.mongodb.net/?retryWrites=true&w=majority"
   )
   .then(() => {
-    console.log("connection success");
+    console.log("Connection to MongoDB successful");
   })
   .catch((err) => {
-    console.log("error mate, " + err);
+    console.error("Error connecting to MongoDB:", err);
   });
 
 const db = mongoose.connection;
