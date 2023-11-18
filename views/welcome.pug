@@ -18,6 +18,10 @@ html
       each article in articles
         p Title: #{article.title}
         p Body: #{article.body}
+        p Author: #{article.username}
+        if username && username === article.username
+          a(href=`/deleteArticle/${article._id}`) Delete
+          br
         br
     if error
       p.error = error

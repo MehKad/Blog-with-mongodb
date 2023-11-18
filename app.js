@@ -113,6 +113,22 @@ app.get("/logout", (req, res) => {
   });
 });
 
+app.get("/deleteArticle/:articleId", async (req, res) => {
+  const articleId = req.params.articleId;
+  try {
+    const article = await Article.findById(articleId);
+    if (article && article.username === req.session.user.username) {
+      await Article.findByIdAndDelete(articleId);
+    }
+    res.redirect("/");
+  } catch (err) {
+    console.error(err);
+    res.render("welcome", {
+      error: "An error occurred while deleting the article",
+    });
+  }
+});
+
 mongoose
   .connect(
     "mongodb+srv://mehkadiri:mehkadiri@test.havg0ya.mongodb.net/?retryWrites=true&w=majority"
