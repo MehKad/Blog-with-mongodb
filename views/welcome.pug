@@ -22,6 +22,8 @@ html
         if username && username === article.username
           a(href=`/deleteArticle/${article._id}`) Delete
           br
+          a(href=`/editArticle/${article._id}`) Edit
+          br
         br
     if error
       p.error = error

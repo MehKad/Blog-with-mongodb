@@ -1,0 +1,11 @@
+html
+   head
+      title Edit Article
+   body
+      h1 Edit Article
+      form(action=`/updateArticle/${article._id}`, method="POST")
+         label(for="title") Title
+         input(type="text", name="title", value=article.title, required)
+         label(for="body") Body
+         textarea(name="body", required)= article.body
+         input(type="submit", value="Update Article")

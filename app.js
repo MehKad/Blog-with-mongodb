@@ -129,6 +129,44 @@ app.get("/deleteArticle/:articleId", async (req, res) => {
   }
 });
 
+app.get("/editArticle/:articleId", async (req, res) => {
+  const articleId = req.params.articleId;
+  try {
+    const article = await Article.findById(articleId);
+    if (article && article.username === req.session.user.username) {
+      res.render("editArticle", { article });
+    } else {
+      res.redirect("/");
+    }
+  } catch (err) {
+    console.error(err);
+    res.render("welcome", {
+      error: "An error occurred while editing the article",
+    });
+  }
+});
+
+app.post("/updateArticle/:articleId", async (req, res) => {
+  const articleId = req.params.articleId;
+  const { title, body } = req.body;
+  try {
+    const article = await Article.findById(articleId);
+    if (article && article.username === req.session.user.username) {
+      article.title = title;
+      article.body = body;
+      await article.save();
+    }
+    res.redirect("/");
+  } catch (err) {
+    console.error(err);
+    const article = await Article.findById(articleId);
+    res.render("editArticle", {
+      article,
+      error: "An error occurred while updating the article",
+    });
+  }
+});
+
 mongoose
   .connect(
     "mongodb+srv://mehkadiri:mehkadiri@test.havg0ya.mongodb.net/?retryWrites=true&w=majority"
